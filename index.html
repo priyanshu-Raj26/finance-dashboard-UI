@@ -4,23 +4,386 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FinFlow — Finance Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <div class="logo-icon">₹</div>
         <span class="logo-text">FinFlow</span>
       </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="transactions">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 7l-5 5 5 5M15 7l5 5-5 5" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="#" class="nav-item" data-page="insights">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 19h18M3 14h3v5H3zM10 9h3v10h-3zM17 4h3v15h-3z" />
+          </svg>
+          <span>Insights</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-role">
+        <label class="role-label">Logged in as</label>
+        <div class="role-select-wrapper">
+          <select id="role-select" class="role-select">
+            <option value="viewer">👁️ Viewer</option>
+            <option value="admin">⚙️ Admin</option>
+          </select>
+        </div>
+        <p class="role-hint" id="role-hint">Read-only access</p>
+      </div>
     </aside>
 
+    <!-- main content -->
     <div class="main-wrapper">
       <header class="topbar">
-        <h1 class="page-title">Dashboard</h1>
+        <button class="hamburger" id="hamburger">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 12h18M3 6h18M3 18h18" />
+          </svg>
+        </button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+        <div class="topbar-right">
+          <button class="theme-btn" id="theme-toggle">
+            <svg
+              class="icon-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg
+              class="icon-sun hidden"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <path
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+              />
+            </svg>
+          </button>
+          <div class="user-chip">
+            <div class="user-avatar">P</div>
+            <span class="user-name">Priyanshu</span>
+          </div>
+        </div>
       </header>
+
       <main class="content">
-        <p>coming soon...</p>
+        <!-- dashboard page -->
+        <section id="page-dashboard" class="page active">
+          <div class="summary-cards" id="summary-cards"></div>
+
+          <div class="charts-row">
+            <div class="chart-card wide">
+              <div class="chart-header">
+                <div>
+                  <h3>Balance Trend</h3>
+                  <p class="chart-sub">Net savings per month</p>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3>Spending Breakdown</h3>
+                  <p class="chart-sub">By category</p>
+                </div>
+              </div>
+              <div class="chart-container donut-container">
+                <canvas id="doughnutChart"></canvas>
+              </div>
+              <div id="donut-legend" class="donut-legend"></div>
+            </div>
+          </div>
+
+          <div class="section-header">
+            <h3>Recent Transactions</h3>
+            <button class="btn-link" data-page="transactions">
+              View All →
+            </button>
+          </div>
+          <div id="recent-list" class="tx-list"></div>
+        </section>
+
+        <!-- transactions page -->
+        <section id="page-transactions" class="page">
+          <div class="tx-toolbar">
+            <div class="search-wrap">
+              <svg
+                class="search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Search transactions..."
+              />
+            </div>
+            <div class="filter-group">
+              <select id="filter-type" class="filter-select">
+                <option value="all">All Types</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+              <select id="filter-category" class="filter-select">
+                <option value="all">All Categories</option>
+              </select>
+              <select id="filter-sort" class="filter-select">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="amount-desc">Highest Amount</option>
+                <option value="amount-asc">Lowest Amount</option>
+              </select>
+            </div>
+            <div class="tx-actions">
+              <span id="tx-count" class="tx-count"></span>
+              <button id="export-btn" class="btn-secondary hidden">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  width="14"
+                  height="14"
+                >
+                  <path
+                    d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                  />
+                </svg>
+                Export CSV
+              </button>
+              <button id="add-tx-btn" class="btn-primary hidden">
+                + Add Transaction
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="tx-table" id="tx-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th id="col-actions" class="hidden">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tx-body"></tbody>
+            </table>
+          </div>
+          <div id="tx-empty" class="empty-state hidden">
+            <div class="empty-emoji">🔍</div>
+            <p>No transactions found</p>
+            <span>Try adjusting your search or filters</span>
+          </div>
+        </section>
+
+        <!-- insights page -->
+        <section id="page-insights" class="page">
+          <div class="insights-grid" id="insights-grid"></div>
+          <div class="chart-card full-width">
+            <div class="chart-header">
+              <div>
+                <h3>Monthly Comparison</h3>
+                <p class="chart-sub">Income vs Expenses — last 4 months</p>
+              </div>
+            </div>
+            <div class="chart-container bar-container">
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
+
+    <!-- mobile bottom nav -->
+    <nav class="mobile-nav">
+      <a href="#" class="mob-item active" data-page="dashboard">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="mob-item" data-page="transactions">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M9 7l-5 5 5 5M15 7l5 5-5 5" />
+        </svg>
+        <span>Transactions</span>
+      </a>
+      <a href="#" class="mob-item" data-page="insights">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 19h18M3 14h3v5H3zM10 9h3v10h-3zM17 4h3v15h-3z" />
+        </svg>
+        <span>Insights</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
+
+    <!-- add/edit transaction modal -->
+    <div class="modal-backdrop hidden" id="modal-backdrop">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-heading">Add Transaction</h3>
+          <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-id" />
+
+          <div class="form-group">
+            <label for="form-desc">Description</label>
+            <input type="text" id="form-desc" placeholder="e.g. Swiggy Order" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-amount">Amount (₹)</label>
+              <input type="number" id="form-amount" placeholder="0" min="1" />
+            </div>
+            <div class="form-group">
+              <label for="form-type">Type</label>
+              <select id="form-type">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-category">Category</label>
+              <select id="form-category">
+                <optgroup label="Income">
+                  <option value="Salary">💼 Salary</option>
+                  <option value="Freelance">💻 Freelance</option>
+                  <option value="Investment">📈 Investment</option>
+                </optgroup>
+                <optgroup label="Expense">
+                  <option value="Food & Dining">🍔 Food & Dining</option>
+                  <option value="Transport">🚗 Transport</option>
+                  <option value="Shopping">🛍️ Shopping</option>
+                  <option value="Entertainment">🎬 Entertainment</option>
+                  <option value="Health">💊 Health</option>
+                  <option value="Education">📚 Education</option>
+                  <option value="Utilities">🔌 Utilities</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="form-date">Date</label>
+              <input type="date" id="form-date" />
+            </div>
+          </div>
+
+          <div class="form-error hidden" id="form-error">
+            Please fill in all fields.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" id="modal-cancel">Cancel</button>
+          <button class="btn-primary" id="modal-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- delete confirmation -->
+    <div class="modal-backdrop hidden" id="confirm-backdrop">
+      <div class="modal confirm-modal">
+        <div class="modal-header">
+          <h3>Delete Transaction</h3>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure? This can't be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" id="confirm-cancel">Cancel</button>
+          <button class="btn-danger" id="confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast hidden" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
