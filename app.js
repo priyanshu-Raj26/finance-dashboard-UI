@@ -259,7 +259,7 @@ function renderRecent() {
 
   if (!recent.length) {
     el.innerHTML =
-      '<div class="empty-state"><div class="empty-emoji">💸</div><p>No transactions yet</p><span>Switch to Admin to add some</span></div>';
+      '<div class="empty-state"><div class="empty-emoji">💸</div><p>No transactions yet</p><span>Try switching to Admin role</span></div>';
     return;
   }
 
