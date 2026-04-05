@@ -635,7 +635,7 @@ function setRole(role) {
   document.getElementById("add-tx-btn").classList.toggle("hidden", !isAdmin);
   document.getElementById("export-btn").classList.toggle("hidden", !isAdmin);
   document.getElementById("role-hint").textContent = isAdmin
-    ? "Full access — can add & edit"
+    ? "Full access — can add, edit & delete"
     : "Read-only access";
 
   if (state.activePage === "transactions") renderTable();
